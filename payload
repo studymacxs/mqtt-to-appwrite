@@ -1,0 +1,7 @@
+{
+  "timestamp": "2025-08-21T16:30:00Z",
+  "temperature": 24.6,
+  "light": 531,
+  "humidity": 52.1,
+  "sensor_data_id": "esp32-abc123-20250821T163000Z"  // optional, für Idempotenz
+}
