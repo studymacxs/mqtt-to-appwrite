@@ -1,0 +1,10 @@
+{
+  "name": "mqtt-to-appwrite",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "mqtt": "^5.8.0",
+    "node-appwrite": "^13.0.0",
+    "ulid": "^2.3.0"
+  }
+}
