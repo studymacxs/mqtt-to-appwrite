@@ -1,0 +1,61 @@
+import { Client, Databases, Query } from "node-appwrite";
+
+const client = new Client()
+  .setEndpoint(process.env.APPWRITE_ENDPOINT)
+  .setProject(process.env.APPWRITE_PROJECT_ID)
+  .setKey(process.env.APPWRITE_API_KEY);
+
+const db = new Databases(client);
+const DB = "plants-db";
+const PLANTS = "plants";
+const SENSOR = "plant_sensor_data";
+
+// 1) Pflanze anlegen
+await db.createDocument(DB, PLANTS, "rose_001", {
+  plant_id: "rose_001",
+  name: "Kletterrose 'New Dawn'",
+  description: "Südseite, halbschattig",
+  ideal_temp_min: 18.0,
+  ideal_temp_max: 26.0,
+  ideal_light_min: 200,
+  ideal_light_max: 1200,
+  ideal_humidity_min: 40.0,
+  ideal_humidity_max: 70.0,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+});
+
+// 2) Messpunkt schreiben
+await db.createDocument(DB, SENSOR, "rose_001_2025-08-22T11:59:00Z", {
+  sensor_data_id: "rose_001_2025-08-22T11:59:00Z",
+  plant_id: "rose_001",
+  timestamp: "2025-08-22T11:59:00Z",
+  temperature: 24.2,
+  light: 530,
+  humidity: 55.1,
+  is_current: false,               // siehe Hinweis unten
+  created_at: new Date().toISOString(),
+});
+
+// 3) Letzten Messpunkt je Pflanze abfragen (ohne is_current, robust gegen Race-Conditions)
+const latest = await db.listDocuments(DB, SENSOR, [
+  Query.equal("plant_id", "rose_001"),
+  Query.orderDesc("timestamp"),
+  Query.limit(1),
+]);
+
+// 4) Verlauf (z. B. letzte 24h)
+const since = new Date(Date.now() - 24*3600*1000).toISOString();
+const history = await db.listDocuments(DB, SENSOR, [
+  Query.equal("plant_id", "rose_001"),
+  Query.greaterEqual("timestamp", since),
+  Query.orderAsc("timestamp"),
+  Query.limit(1000),
+]);
+
+// 5) Chat: Nachrichten einer Session aufsteigend nach Zeit
+const messages = await db.listDocuments(DB, "chat_messages", [
+  Query.equal("session_id", "sess_123"),
+  Query.orderAsc("timestamp"),
+  Query.limit(100),
+]);
