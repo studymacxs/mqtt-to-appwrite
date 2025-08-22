@@ -1,34 +1,14 @@
-version: "3.8"
+version: '3.8'
 services:
-  mosquitto:
-    image: eclipse-mosquitto:2
-    container_name: mosquitto
+  mqtt-broker:
+    image: eclipse-mosquitto:2.0
+    container_name: mqtt-broker
     restart: unless-stopped
     ports:
-      - "1883:1883"
-      - "8883:8883"
+      - "1883:1883"   # MQTT
+      - "8883:8883"   # MQTT over TLS
+      - "9001:9001"   # Websockets
     volumes:
-      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
-      - ./mosquitto_data:/mosquitto/data
-      - ./mosquitto_log:/mosquitto/log
-      # falls TLS:
-      # - ./certs:/mosquitto/certs:ro
-
-  mqtt-to-appwrite:
-    build: ./mqtt-to-appwrite
-    container_name: mqtt-to-appwrite
-    restart: unless-stopped
-    environment:
-      APPWRITE_ENDPOINT: ${APPWRITE_ENDPOINT}
-      APPWRITE_PROJECT_ID: ${APPWRITE_PROJECT_ID}
-      APPWRITE_API_KEY: ${APPWRITE_API_KEY}
-      APPWRITE_DB_ID: ${APPWRITE_DB_ID}
-      COLL_PLANTS: plants
-      COLL_SENSOR: plant_sensor_data
-      MQTT_URL: mqtt://mosquitto:1883
-      MQTT_USERNAME: ${MQTT_USERNAME}
-      MQTT_PASSWORD: ${MQTT_PASSWORD}
-      # Sicherheits-/Performancetuning:
-      UPSERT_PLANT_ON_SEEN: "true"
-      FLUSH_IS_CURRENT: "true"
-      BATCH_INSERT: "false"
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
