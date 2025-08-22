@@ -1,0 +1,5 @@
+export APPWRITE_ENDPOINT="https://fra.cloud.appwrite.io/v1"
+export APPWRITE_PROJECT_ID="your-project-id"
+export APPWRITE_API_KEY="your-api-key"
+
+node schema-setup.js
